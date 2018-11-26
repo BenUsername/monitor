@@ -31,14 +31,3 @@ for k in range(0,10+1):
         list += names
 
 print(list)
-
-with open("list_company.html", "w") as file:
-        file.write(str(list))
-
-if any(">ABGENIX INC<" in s for s in list):
-    print("ABGENIX INC in!")
-else: print("no ABGENIX!")
-
-if any("Xenacar" in s for s in list):
-    print("Xenacar in!")
-else: print("no Xenacar!")
