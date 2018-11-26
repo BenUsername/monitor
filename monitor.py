@@ -1,13 +1,5 @@
-#checks new info
-
-#goes on website adn checks today's date
-
-#if toady's date grab name
-
-#go on two other URL and checks if name is in there
-
-#if yes send an email
-
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # clears terminal for both windows and Unix
 
 # Import requests (to download the page)
 import requests
@@ -21,16 +13,12 @@ import time
 # Import smtplib (to allow us to email)
 import smtplib
 
-# Import datetime to get today's date
-import datetime
+list_recent = []
+text = "start"
 
-# This is a pretty simple script. The script downloads the homepage of VentureBeat, and if it finds some text, emails me.
-# If it does not find some text, it waits 60 seconds and downloads the homepage again.
-
-# while this is true (it is true by default),
-while True:
+for k in range (0,5+1):
     # set the url as VentureBeat,
-    url = "https://www.sec.gov/cgi-bin/browse-edgar?company=&CIK=&type=&owner=only&count=100&action=getcurrent"
+    url = f"https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&datea=&dateb=&company=&type=&SIC=&State=&Country=&CIK=&owner=only&accno=&start={k*100}&count=100"
     # set the headers like we are a browser,
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
     # download the homepage
@@ -38,39 +26,88 @@ while True:
     # parse the downloaded homepage and grab all text, then,
     soup = BeautifulSoup(response.text, "lxml")
 
-    # get today's date in format YYYY-MM-DD
-    date = datetime.datetime.today().strftime('%Y-%m-%d')
+    text = [td.text for td in soup.find_all('a')]
 
-    # if the number of times the word "Google" occurs on the page is less than 1,
-    if str(soup).find("Google") == -1:
-        # wait 60 seconds,
-        time.sleep(60)
-        # continue with the script,
-        continue
+    if text == []:
+        break
 
-    # but if the word "Google" occurs any other number of times,
     else:
+        list_recent += text
+
+with open("list_recent.html", "w") as file:
+    file.write(str(list_recent))
+
+list_names = []
+names = "start"
+
+for k in range(0,10+1):
+
+    url = f"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&SIC=2836&owner=include&match=&start={k*100}&count=100&hidefilings=0"
+    # set the headers like we are a browser,
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+    # download the homepage
+    response = requests.get(url, headers=headers)
+    html = response.text
+    # parse the downloaded homepage and grab all text, then,
+    soup = BeautifulSoup(html, "lxml")
+
+    names = [td.text for td in soup.find_all('td')]
+
+    if names == []:
+        break
+
+    else:
+        list_names += names
+
+for k in range(0,10+1):
+
+    url = f"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&SIC=2834&owner=include&match=&start={k*100}&count=100&hidefilings=0"
+    # set the headers like we are a browser,
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+    # download the homepage
+    response = requests.get(url, headers=headers)
+    html = response.text
+    # parse the downloaded homepage and grab all text, then,
+    soup = BeautifulSoup(html, "lxml")
+
+    names = [td.text for td in soup.find_all('td')]
+
+    if names == []:
+        break
+
+    else:
+        list_names += names
+
+with open("list_names.html", "w") as file:
+    file.write(str(list_names))
+
+
+for company in list_recent:
+    if company in list_names:
+        print(f"{company} has recent news")
+
         # create an email message with just a subject line,
-        msg = 'Subject: This is Chris\'s script talking, CHECK GOOGLE!'
+        msg = f'Subject: This is Ben\'s script talking, {company} has recent news'
         # set the 'from' address,
-        fromaddr = 'YOUR_EMAIL_ADDRESS'
+        fromaddr = 'maxbaude0@gmail.com'
         # set the 'to' addresses,
-        toaddrs  = ['AN_EMAIL_ADDRESS','A_SECOND_EMAIL_ADDRESS', 'A_THIRD_EMAIL_ADDRESS']
+        toaddrs  = ['btann93@gmail.com','ben.tannenbaum1@gmail.com', 'b.tannenbaum88@gmail.com']
 
         # setup the email server,
-        # server = smtplib.SMTP('smtp.gmail.com', 587)
-        # server.starttls()
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
         # add my account login name and password,
-        # server.login("YOUR_EMAIL_ADDRESS", "YOUR_PASSWORD")
+        server.login("maxbaude0@gmail.com", "professeur7")
 
         # Print the email's contents
         print('From: ' + fromaddr)
         print('To: ' + str(toaddrs))
         print('Message: ' + msg)
 
-        # send the email
-        # server.sendmail(fromaddr, toaddrs, msg)
-        # disconnect from the server
-        # server.quit()
+        #send the email
+        server.sendmail(fromaddr, toaddrs, msg)
+        #disconnect from the server
+        server.quit()
 
-        break
+    else:
+        continue
