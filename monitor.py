@@ -78,9 +78,9 @@ with open("list_names.html", "w") as file:
 
 for company in list_recent:
     if company in list_names:
+        
         print(f"{company} has recent news")
 
-        
         # create an email message with just a subject line,
         msg = f'Subject: This is Ben\'s script talking, {company} has recent news'
         # set the 'from' address,
